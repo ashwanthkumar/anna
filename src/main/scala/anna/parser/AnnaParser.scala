@@ -8,6 +8,7 @@ object AnnaParser extends RegexParsers {
   def USING = regexIgnoreCase("USING")
   def AS = regexIgnoreCase("AS")
   def END = regexIgnoreCase("END")
+  def FORK = regexIgnoreCase("FORK")
   def QUOTE = literal("\"")
   def identifier = QUOTE ~> regex("[a-zA-Z0-9_]+".r) <~ QUOTE
   def implementation = QUOTE ~> regex("[a-zA-Z0-9_.]+".r).named("implementation name") <~ QUOTE
@@ -23,11 +24,15 @@ object AnnaParser extends RegexParsers {
   def sinkStatement = operationSpec("SINK")
   def sourceStatement = operationSpec("SOURCE")
 
-  def stageSpec = transformStatement.+ ~ validatorStatement.+ ~ sinkStatement ^^ {
-    case transformers ~ validators ~ sink => StageSpec(transformers, validators, sink)
+  def stagesWithForks = FORK.* ~> transformStatement.+ ~ validatorStatement.+ ~ sinkStatement ^^ {
+    case transformers ~ validators ~ sink => StageSpec(isForked = true, transformers, validators, Some(sink))
   }
 
-  def annaSpec = jobHeader ~ sourceStatement ~ stageSpec.+ <~ END ^^ {
+  def stageSpec = transformStatement.+ ~ validatorStatement.+ ~ opt(sinkStatement) ^^ {
+    case transformers ~ validators ~ sink => StageSpec(isForked = false, transformers, validators, sink)
+  }
+
+  def annaSpec = jobHeader ~ sourceStatement ~ (stageSpec | stagesWithForks).+ <~ END ^^ {
     case jobName ~ source ~ stages => JobSpec(jobName, source, stages)
   }
 
