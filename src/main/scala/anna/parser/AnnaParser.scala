@@ -6,6 +6,9 @@ object AnnaParser extends RegexParsers {
   protected def regexIgnoreCase(regex: String) = s"(?i)$regex".r
   def JOB = regexIgnoreCase("JOB")
   def USING = regexIgnoreCase("USING")
+  def VALIDATE = regexIgnoreCase("VALIDATE")
+  def MANDATORY = regexIgnoreCase("MANDATORY")
+  def OPTIONAL = regexIgnoreCase("OPTIONAL")
   def AS = regexIgnoreCase("AS")
   def END = regexIgnoreCase("END")
   def FORK = regexIgnoreCase("FORK")
@@ -20,9 +23,16 @@ object AnnaParser extends RegexParsers {
   }
 
   def transformStatement = operationSpec("TRANSFORM")
-  def validatorStatement = operationSpec("VALIDATE")
   def sinkStatement = operationSpec("SINK")
   def sourceStatement = operationSpec("SOURCE")
+
+  def validatorStatement = {
+    def typeOfValidation = MANDATORY ^^ { _ => true} | OPTIONAL ^^ { _ => false}
+    literal("VALIDATE") ~> typeOfValidation ~ USING ~ implementation ~ opt(asName) ^^ {
+      case validationType ~ _ ~ using ~ as => ValidatorSpec(using, as, validationType)
+    }
+  }
+
 
   def stagesWithForks = FORK.* ~> transformStatement.+ ~ validatorStatement.+ ~ sinkStatement ^^ {
     case transformers ~ validators ~ sink => StageSpec(isForked = true, transformers, validators, Some(sink))

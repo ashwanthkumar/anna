@@ -18,7 +18,7 @@ class AnnaParserTest extends FlatSpec with TestUtils {
         OperationSpec("a.b.c.HtmlToParseResult", Some("parser"))
       ),
       validator = List(
-        OperationSpec("d.e.f.ParseResultValidator", None)
+        ValidatorSpec("d.e.f.ParseResultValidator", None, isMandatory = false)
       ),
       sink = Some(OperationSpec("x.y.z.PailWriter", Some("parseResult")))
     )
@@ -52,7 +52,7 @@ class AnnaParserTest extends FlatSpec with TestUtils {
         OperationSpec("a.b.c.HtmlToParseResult", Some("parser"))
       ),
       validator = List(
-        OperationSpec("d.e.f.ParseResultValidator", None)
+        ValidatorSpec("d.e.f.ParseResultValidator", None, isMandatory = false)
       ),
       sink = None
     )
@@ -63,7 +63,7 @@ class AnnaParserTest extends FlatSpec with TestUtils {
         OperationSpec("a.b.c.ParseResultToPrice", None)
       ),
       validator = List(
-        OperationSpec("d.e.f.PriceValidator", None)
+        ValidatorSpec("d.e.f.PriceValidator", None, isMandatory = true)
       ),
       sink = Some(OperationSpec("x.y.z.PailWriter", Some("price")))
     )
@@ -73,7 +73,7 @@ class AnnaParserTest extends FlatSpec with TestUtils {
         OperationSpec("a.b.c.ParseResultToProduct", None)
       ),
       validator = List(
-        OperationSpec("d.e.f.ProductValidator", None)
+        ValidatorSpec("d.e.f.ProductValidator", None, isMandatory = true)
       ),
       sink = Some(OperationSpec("x.y.z.PailWriter", Some("product")))
     )
