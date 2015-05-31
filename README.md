@@ -1,3 +1,5 @@
+[![Build Status](https://snap-ci.com/ashwanthkumar/anna/branch/master/build_image)](https://snap-ci.com/ashwanthkumar/anna/branch/master)
+
 # anna
 Hobby project inspired from [Goblin](https://github.com/linkedin/gobblin).
 
