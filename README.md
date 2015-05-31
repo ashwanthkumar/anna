@@ -17,6 +17,23 @@ JOB "readTsvAndParse"
     SINK USING "x.y.z.PailWriter" AS "parseResult"
 END
 ```
+You could also have FORKs in your processing pipeline as in the following example
+```
+JOB "readTsvAndParse"
+    SOURCE USING "a.b.c.FromTSV" as "tsvSource"
+    TRANSFORM USING "a.b.c.TSVToHtml"
+    TRANSFORM USING "a.b.c.HtmlToParseResult" AS "parser"
+    VALIDATE USING "d.e.f.ParseResultValidator"
+    FORK
+        TRANSFORM USING "a.b.c.ParseResultToProduct"
+        VALIDATE USING "d.e.f.ProductValidator"
+        SINK USING "x.y.z.PailWriter" AS "product"
+    FORK
+        TRANSFORM USING "a.b.c.ParseResultToPrice"
+        VALIDATE USING "d.e.f.PriceValidator"
+        SINK USING "x.y.z.PailWriter" AS "price"
+END
+```
 
 ## TODOs
 - Add more descriptive documentation
